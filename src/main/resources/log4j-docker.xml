@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--日志级别以及优先级排序: OFF > FATAL > ERROR > WARN > INFO > DEBUG > TRACE > ALL -->
+<!--status：这个用于设置log4j2自身内部的信息输出，可以不设置，当设置成trace时，你会看到log4j2内部各种详细输出-->
+<!--monitorInterval：Log4j能够自动检测修改配置文件和重新配置本身，设置间隔秒数，如下配置为30分钟检测一次-->
+<configuration>
+    <Properties>
+        <!-- <property name="FILE_PATH">~/logs/yesway-framework-backend/bms</property> -->
+        <!-- 格式化输出：%date表示日期，%thread表示线程名，%-5level：级别从左显示5个字符宽度 %msg：日志消息，%n是换行符 -->
+        <property name="LOG_PATTERN">
+            [%d{yyyy-MM-dd HH:mm:ss.SSS}] [%-5level] [%thread] [%c.%M] [%L] [%X{X-B3-TraceId:-}] [%X{X-B3-SpanId:-}] :
+            %m%n
+        </property>
+    </Properties>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout pattern="${LOG_PATTERN}"/>
+            <!-- onMatch：控制台只输出level及其以上级别的信息。onMismatch：其他的直接拒绝。 -->
+            <ThresholdFilter level="INFO" onMatch="ACCEPT" onMismatch="DENY"/>
+        </Console>
+    </Appenders>
+    <Loggers>
+        <Root level="INFO">
+            <AppenderRef ref="Console"/>
+        </Root>
+    </Loggers>
+</configuration>
