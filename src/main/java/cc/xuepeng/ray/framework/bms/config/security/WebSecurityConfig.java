@@ -3,6 +3,7 @@ package cc.xuepeng.ray.framework.bms.config.security;
 import cc.xuepeng.ray.framework.bms.bean.request.OpLogContentRequestBean;
 import cc.xuepeng.ray.framework.bms.bean.request.OpLogRequestBean;
 import cc.xuepeng.ray.framework.bms.bean.response.LoginSuccessResponseBean;
+import cc.xuepeng.ray.framework.bms.config.filter.VerificationCodeFilter;
 import cc.xuepeng.ray.framework.core.util.bean.BeanUtil;
 import cc.xuepeng.ray.framework.core.util.entity.http.DefaultHttpResultFactory;
 import cc.xuepeng.ray.framework.core.web.ip.IPUtil;
@@ -24,6 +25,7 @@ import org.springframework.security.web.access.AccessDeniedHandler;
 import org.springframework.security.web.access.intercept.FilterSecurityInterceptor;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.logout.LogoutSuccessHandler;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.DefaultCsrfToken;
@@ -82,19 +84,21 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
                 .successHandler(authenticationSuccessHandler())
                 // 设置登录请求地址，同时验证码过滤器拦截此url
                 .loginProcessingUrl(webSecurityUrlProperties.getSignin()).permitAll()
-                // 设置登出请求地址，登出时删除Cookies
-                .and().logout().logoutUrl(webSecurityUrlProperties.getSignout())
-                .deleteCookies("XSRF-TOKEN", "SESSION", "JSESSIONID").permitAll()
-                // 登出成功返回数据
+                // 设置登出请求地址，登出时删除Cookies，登出成功返回数据
+                .and()
+                .logout().logoutUrl(webSecurityUrlProperties.getSignout())
+                .invalidateHttpSession(true)
+                .deleteCookies("XSRF-TOKEN", "SESSION").permitAll()
                 .logoutSuccessHandler(logoutSuccessHandler())
                 // 无权限返回数据
                 .and().exceptionHandling().accessDeniedHandler(accessDeniedHandler())
                 // 登录身份超时返回数据
-                .and().sessionManagement().invalidSessionUrl(webSecurityUrlProperties.getLoginPage())
+                .and().sessionManagement().invalidSessionStrategy(sessionTimeout())
                 // 设置是否只允许一个用户登录
                 .maximumSessions(-1)
                 .sessionRegistry(sessionRegistry())
                 .expiredSessionStrategy(sessionInformationExpiredStrategy());
+        http.addFilterBefore(verificationCodeFilter, UsernamePasswordAuthenticationFilter.class);
     }
 
     /**
@@ -320,6 +324,16 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     }
 
     /**
+     * 自动装配图片验证码的验证过滤器。
+     *
+     * @param verificationCodeFilter 图片验证码的验证过滤器。
+     */
+    @Autowired
+    public void setVerificationCodeFilter(VerificationCodeFilter verificationCodeFilter) {
+        this.verificationCodeFilter = verificationCodeFilter;
+    }
+
+    /**
      * 定义SpringSecurity所需的Url。
      */
     private WebSecurityUrlProperties webSecurityUrlProperties;
@@ -339,5 +353,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
      * 操作日志业务处理接口。
      */
     private SysOpLogService sysOpLogService;
+    /**
+     * 图片验证码的验证过滤器。
+     */
+    private VerificationCodeFilter verificationCodeFilter;
 
 }

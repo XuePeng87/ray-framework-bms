@@ -1,6 +1,5 @@
 package cc.xuepeng.ray.framework.bms.controller;
 
-import cc.xuepeng.ray.framework.bms.bean.request.JigsawRequestBean;
 import cc.xuepeng.ray.framework.bms.bean.response.JigsawResponseBean;
 import cc.xuepeng.ray.framework.bms.service.JigsawVerifyService;
 import cc.xuepeng.ray.framework.core.util.bean.BeanUtil;
@@ -9,7 +8,6 @@ import cc.xuepeng.ray.framework.core.util.entity.http.HttpResult;
 import cc.xuepeng.ray.framework.core.util.jigsaw.Jigsaw;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
@@ -32,22 +30,6 @@ public class JigsawVerifyController {
         Jigsaw jigsaw = jigsawVerifyService.create();
         return DefaultHttpResultFactory.success("验证码生成成功。",
                 BeanUtil.objToObj(jigsaw, JigsawResponseBean.class));
-    }
-
-    /**
-     * 验证拼图验证码。
-     *
-     * @param jigsawRequestBean 拼图验证码请求信息。
-     * @return 是否通过验证。
-     */
-    @PostMapping("/v1/validate")
-    public HttpResult<Boolean> validate(@RequestBody final JigsawRequestBean jigsawRequestBean) {
-        Jigsaw jigsaw = BeanUtil.objToObj(jigsawRequestBean, Jigsaw.class);
-        boolean result = jigsawVerifyService.validate(jigsaw);
-        if (result) {
-            return DefaultHttpResultFactory.success("验证成功。", Boolean.TRUE);
-        }
-        return DefaultHttpResultFactory.success("验证失败。", Boolean.FALSE);
     }
 
     /**

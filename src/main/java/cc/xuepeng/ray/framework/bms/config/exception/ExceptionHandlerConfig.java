@@ -1,6 +1,7 @@
 package cc.xuepeng.ray.framework.bms.config.exception;
 
 import cc.xuepeng.ray.framework.bms.exception.JigsawVerificationExpiredException;
+import cc.xuepeng.ray.framework.bms.exception.JigsawVerificationMismatchException;
 import cc.xuepeng.ray.framework.core.util.entity.http.DefaultHttpResultFactory;
 import cc.xuepeng.ray.framework.core.util.entity.http.HttpResult;
 import cc.xuepeng.ray.framework.sdk.mgt.exception.*;
@@ -171,20 +172,20 @@ public class ExceptionHandlerConfig {
     @ResponseBody
     public HttpResult<Boolean> jigsawVerificationExpiredExceptionExceptionHandler(JigsawVerificationExpiredException e) {
         log.error(e.getMessage());
-        return DefaultHttpResultFactory.success("验证码超时。", Boolean.FALSE);
+        return DefaultHttpResultFactory.fail("验证码超时。", Boolean.FALSE);
     }
 
     /**
-     * Exception的处理方法。
+     * JigsawVerificationMismatchException的处理方法。
      *
-     * @param e Exception。
+     * @param e JigsawVerificationMismatchException。
      * @return 错误信息。
      */
-    @ExceptionHandler(value = Exception.class)
+    @ExceptionHandler(value = JigsawVerificationMismatchException.class)
     @ResponseBody
-    public HttpResult<String> exceptionHandler(Exception e) {
+    public HttpResult<Boolean> jigsawVerificationMismatchExceptionHandler(JigsawVerificationMismatchException e) {
         log.error(e.getMessage());
-        return DefaultHttpResultFactory.fail("业务异常：" + e.getMessage(), e.getMessage());
+        return DefaultHttpResultFactory.fail("验证码错误。", Boolean.FALSE);
     }
 
 }

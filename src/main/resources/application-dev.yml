@@ -45,6 +45,17 @@ spring:
         min-idle: 0
         max-idle: 10
     timeout: 5000
+  rabbitmq:
+    host: 127.0.0.1
+    port: 5672
+    username: root
+    password: root
+    virtual-host: /
+    connection-timeout: 5000ms
+    listener:
+      simple:
+        acknowledge-mode: manual
+        prefetch: 1000
   session:
     store-type: redis
   servlet:
@@ -84,7 +95,6 @@ ray:
           - /v1/forget-password/v1/need-verify
           - /v1/jigsaw-verify/v1/create
           - /v1/jigsaw-verify/v1/validate
-          - /notify/**
           - /v1/logger/v1/open
           - /v1/logger/v1/close
           - /v1/index/v1
